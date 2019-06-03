@@ -1,0 +1,21 @@
+Plate,Well,Well Number,Reagent
+src_plate,A1,1,Na2HPO4
+src_plate,A2,2,Na2HPO4
+src_plate,A3,3,KH2PO4
+src_plate,A4,4,KH2PO4
+src_plate,A5,5,NaCl
+src_plate,A6,6,NaCl
+src_plate,A7,7,NaCl
+src_plate,A8,8,(NH4)2SO4
+src_plate,A9,9,CaCl2
+src_plate,A10,10,FeSO4
+src_plate,A11,11,CoCl2
+src_plate,A12,12,CuSO4
+src_plate,B1,13,MgSO4
+src_plate,B2,14,MnCl2
+src_plate,B3,15,Na2MoO4
+src_plate,B4,16,ZnSO4
+src_plate,B5,17,Glucose
+src_plate,B6,18,Glucose
+src_plate,B7,19,Glucose
+src_plate,B8,20,Glucose

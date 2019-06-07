@@ -10,11 +10,11 @@ If this is the first cycle, media must either be prespecified or created using t
 
 > **_NOTE:_**  The headers must be spelled identically as above in order to work properly
 
-> **_NOTE:_**  Glucose is specified in percent below.
+> **_NOTE:_**  Glucose is specified in percent below, as a result 40% Glucose is written as 0.04.
 
 | Media Components | Master Solution Concentration \[M\] | Min Concentration \[mM\] | Max Concentration \[mM\]
 |---------|----|----|----|
-| Glucose | 40 |   0|   5|
+| Glucose | 0.04|   0|   5|
 | Na2HPO4 |  1 |  10|  30|   
 
 
@@ -58,7 +58,7 @@ Running that command generates a set of csvs inside of the biomek_files director
 
 ## 3. Synthesize Media on the BioMek NxP Platform
 
-> **_Point of Contact:_**  Tad Ogorzalek
+> **_Point of Contact:_**  Tad Ogorzalek.  Tad will know how to get access to the BioMek Remotely and Transfer Files.  I will not explicitly cover the use of these machines here, but instead leave it to Tad to instruct you on the details.
 
 > **_Note:_** I reccomend for anyone running this protocol to have Tad look over your work as you work with the biomek the first time.
 
@@ -67,14 +67,19 @@ In this step we synthesize all of the media required one plate must be created f
 - 3 Costar Deep Well Plates
 - 1 BioMek Flower Plate
 - 8 Plates of 200uL Robotic Tips
+- Stock solutions for all Specified Media Components
+
+> **_Error Source (Stock Solution Creation):_** Stock Solutions are made by hand.  There is human measurement error associated with each stock solution.  When making these attempt to be as accurate as possible and consider only measuring quantites in excess of 1 gram, and diluting your solution down to the correct concentration if possible. At lower than 1 gram as much as 50% error can be normal making stock solutions highly variable. This error is particularly insidious because stock solutions are made only occasionally so the error is only noticed once the solution is changed.  A Gold standard would be making a 3rd plate and running it through some form of chromotography.
+
 
 There is both a lab component and electronic component to this protocol.
 
-1. [Lab] Fill up one of the deep well plates As specified by the dataframe used in step 2.  Using the example above Well 1 of the source plate would be filled with 1000 uL of Glucose and Well 2 would be filled with 1000 uL Na2HP04 stock solution.  Its a good idea to put more volume than is specified I usually add 1200 uL.
+1. [Lab] Fill up one of the deep well plates As specified by the dataframe used in step 2.  Using the example above Well 1 of the source plate would be filled with 1000 uL of 40% Glucose Solution and Well 2 would be filled with 1000 uL Na2HP04 stock solution.  Its a good idea to put more volume than is specified. I usually add 1200 uL.
 
-2. [Lab] Fill up a Costar Deep Well Plate 1700 uL of Water in each well.
+2. [Lab] Fill up a Costar Deep Well Plate 1700 uL of Water in each well. If you want to save time and there are only a few wells needed you can only fill up the wells specified from the deck dataframe generated in step 1.
 
-3. [Electronic] Copy the following files from your local machine to the biomek NxP computer in the following directory: 
+3. [Electronic] Copy the following files, generated in step 2, from your local machine to the biomek NxP computer to C:\Users\jbei\Documents\ZakCostello\CombinatorialMedia\RUN: 
+- 
 
 4. [Lab] Set up the Deck as specified above where the stock solution plate is in the first position in the to left.
 
@@ -84,3 +89,7 @@ There is both a lab component and electronic component to this protocol.
 
 ### Finishing the Media Plate
 The Media Plate May need to be finished in order to move to the next step and do fermentation. Specifically, adding antibiotic, which is reccomended due to the fact that sterile conditions are hard to maintain in the robotics lab during the media creation process. Inducer needs to be added in the case of production. Innoculation is currently done by hand, either from an overnight culture on the first adaptation plate or from the previous plate. 
+
+
+## 4. Performing Fermentations Using the Biolector
+

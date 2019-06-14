@@ -122,7 +122,16 @@ The Media Plate May need to be finished in order to move to the next step and do
 > **_Point of Contact:_**  Tad Ogorzalek. Tad knows all the details of Biolector use and Maintenence. For detailed use of the biolector please ask Tad and get training on how to use this machine correctly.
 
 1. Create 3 biological replicates of an overnight culture of the strain to be tested.
-2. Innoculate the Adaptation plate With the completed overnight culture.
+
+    a. First create 4 culture tubes by adding 5mL of LB media with chloramphenicol to each tube.
+    
+    b. In the first three tubes, innoculate with a single colony of the desired strain.  Do this by touching a pipette tip to the colony of interest and then dropping it in the tube. In the fourth tube leave it as is as a negative control.
+    
+    c. Incubate overnight in the 30 degree warm room in the case of pseudomonas 
+    putida.
+
+2. Innoculate the Adaptation plate With the completed overnight culture. Columns A and D are innoculated with replicate 1, Columns B and E are innoculated with replicate 2, and Columns C and F are innoculated with replicate 3.
+
 3. Cover the Biolector plate with a biolector plate seal.
 4. Put the plate in the biolector.
 5. **[very important!]** Edit the CombinatorialMediaTest Protocol so it has the same batch number as the plate.  Failure to do this will result in incorrect calibration of optodes.
@@ -139,6 +148,15 @@ The Media Plate May need to be finished in order to move to the next step and do
 Currently I do not have specific instructions for this step.  Please see the relevant analytical chemist for the protocol you will be using. 
 
 ## 6. Upload Data to the Experiment Data Depot
+I have created a notebook that makes Experiment Data Depot upload files for the indigoidine study it can be found here: [EDD Upload Notebook](notebooks/EDD_Study_File_Creator.ipynb)
+
+This notebook takes in a Media Description file along with data produced from assying production and formats it into a file that can be uploaded into EDD to create a new study.
 
 
 ## 7. Get Predictions From ART & Use to Create New Media Definitions
+
+> **_Point of Contact:_**  Tijana Radivojevic.  Tijana is the developer of ART and can help make predictions from an EDD study. Please get in touch with Tijana to Create Predictions with ART.
+
+Use Tijana's instructions on the [ART github](https://github.com/JBEI/AutomatedRecommendationTool) to install and use ART to make predictions about which media to try next.
+
+Once Art Predictions are created, I used the following [notebook](notebooks/MakeMediaFromRecs.ipynb) to translate the art predictions into an input file for the media compiler.

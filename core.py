@@ -10,8 +10,6 @@ from pyDOE import lhs
 pip_volume_threshold = 50  # threshold for using p300 above that volume
 mix_times: int = 3         # number of times for mixing
 rel_mix_volume = 0.75      # mixing volume, relative to the well volume
-touch_tip_speed = 40       # [mm/s] default is 60
-touch_tip_offset = -2      # -2mm from top of well for the touch tip
 
 
 def find_volumes(well_volume: float,
@@ -242,3 +240,11 @@ def round_volume(volume: np.ndarray, well_volume: int):
 
 def float_round(num, places=0, direction=ceil):
     return direction(num * (10**places)) / float(10**places)
+
+
+def create_media_description(series: pd.Series):
+    "Creates full media description by reading columns of components concentrations"
+    description = ''
+    for item, value in series.iteritems():
+        description += f'{item}: {value:0.4f}, '
+    return description[:-2]

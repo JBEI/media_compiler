@@ -107,27 +107,37 @@ def check_solubility(df, solubility, verbose=True):
 
 
 def test_volumes(df_stock, 
-                 target_conc_low, 
-                 target_conc_high, 
-                 n_samples, 
-                 well_volume,
-                 min_tip_volume,
-                 culture_ratio,
+                 target_conc_low=None, 
+                 target_conc_high=None, 
+                 df_target_conc=None,
+                 n_samples=None, 
+                 well_volume=None,
+                 min_tip_volume=None,
+                 culture_ratio=None,
                  verbose=0):
     
-    latin_hc = lhs(
-        len(df_stock), samples=n_samples, criterion="maximin"
-    )
-
     EPS = 0.000001
+    
+    df_volumes = df_target_conc.copy()
+    df_volumes['Water'] = None
+        
+    if df_target_conc is None:
+        latin_hc = lhs(
+            len(df_stock), samples=n_samples, criterion="maximin"
+        )
 
-    lb = target_conc_low.ravel()
-    ub = target_conc_high.ravel()
+        lb = target_conc_low.ravel()
+        ub = target_conc_high.ravel()
 
-    target_conc_val = lb + latin_hc * (ub - lb)
+        target_conc_val = lb + latin_hc * (ub - lb)
+    else:
+        target_conc_val = df_target_conc.values
     
     success_num = 0
     success_wat_num = 0
+    
+    if n_samples is None:
+        n_samples = len(df_target_conc)
 
     for i in range(n_samples):
         if verbose >= 1:
@@ -146,6 +156,8 @@ def test_volumes(df_stock,
                     print(f'High: Not all volumes are >={min_tip_volume} uL!')
 
                 comp_small_vol = df_example[df_example['Volumes[uL]'] < min_tip_volume - EPS].index 
+                if verbose:
+                    print(f'Compoments small: {comp_small_vol}')
                 for comp in comp_small_vol:
                     df_example.at[comp, 'Stock Concentration[mM]'] = df_stock.at[comp,'Low Concentration[mM]']
 
@@ -206,9 +218,13 @@ def test_volumes(df_stock,
                 if verbose >= 1:
                     print('Failed Low')
                 pass
+        
+        df_volumes.iloc[i] = list(volumes)
     
     print(f'Sucess rate: {100*success_num/n_samples}%')
     print(f'Sucess rate (water): {100*success_wat_num/n_samples}%')
+    
+    return df_volumes
     
 
 def find_dilutions(volumes):

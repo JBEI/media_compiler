@@ -106,11 +106,8 @@ def check_solubility(df, solubility, verbose=True):
     return components
 
 
-def test_volumes(df_stock, 
-                 target_conc_low=None, 
-                 target_conc_high=None, 
+def find_volumes_bulk(df_stock,  
                  df_target_conc=None,
-                 n_samples=None, 
                  well_volume=None,
                  min_tip_volume=None,
                  culture_ratio=None,
@@ -121,23 +118,12 @@ def test_volumes(df_stock,
     df_volumes = df_target_conc.copy()
     df_volumes['Water'] = None
         
-    if df_target_conc is None:
-        latin_hc = lhs(
-            len(df_stock), samples=n_samples, criterion="maximin"
-        )
-
-        lb = target_conc_low.ravel()
-        ub = target_conc_high.ravel()
-
-        target_conc_val = lb + latin_hc * (ub - lb)
-    else:
-        target_conc_val = df_target_conc.values
+    target_conc_val = df_target_conc.values
     
     success_num = 0
     success_wat_num = 0
     
-    if n_samples is None:
-        n_samples = len(df_target_conc)
+    n_samples = len(df_target_conc)
 
     for i in range(n_samples):
         if verbose >= 1:
@@ -192,7 +178,6 @@ def test_volumes(df_stock,
             if verbose >= 1:
                 print('Failed High + Low min vol')
             pass
-
 
         if not success:
             try:

@@ -247,5 +247,5 @@ def create_media_description(series: pd.Series):
     "Creates full media description by reading columns of components concentrations"
     description = ''
     for item, value in series.iteritems():
-        description += f'{item}: {value:0.4f}, '
+        description += f'{item}: {value:0.6f}, '
     return description[:-2]

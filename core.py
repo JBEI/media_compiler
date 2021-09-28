@@ -5,6 +5,7 @@ import string
 import pandas as pd
 import numpy as np
 from pyDOE import lhs
+import matplotlib.pyplot as plt
 
 
 pip_volume_threshold = 50  # threshold for using p300 above that volume

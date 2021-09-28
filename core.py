@@ -249,3 +249,40 @@ def create_media_description(series: pd.Series):
     for item, value in series.iteritems():
         description += f'{item}: {value:0.6f}, '
     return description[:-2]
+
+
+def designs_pairwise(art, df):
+
+    dim = art.num_input_var
+
+    plt.style.use(["seaborn-talk"])
+
+    fig = plt.figure(figsize=(35, 35))
+    fig.patch.set_facecolor("white")
+
+    X = df.values
+
+    for var1 in range(dim):
+        for var2 in range(var1 + 1, dim):
+
+            ax = fig.add_subplot(dim, dim, (var2 * dim + var1 + 1))
+            ax.scatter(
+                X[:, var1],
+                X[:, var2],
+                c="r",
+                edgecolor="r",
+                marker="+",
+                lw=1,
+                label="Train data",
+            )
+            
+            if var2 == (dim - 1):
+                ax.set_xlabel(art.input_vars[var1])
+            if var1 == 0:
+                ax.set_ylabel(art.input_vars[var2])
+                if var2 == 0:
+                    ax.legend(loc="center left", bbox_to_anchor=(1, 0.5), shadow=True)
+
+    fig.savefig(f'{art.outDir}/designs_pairwise.png', transparent=False, dpi=300
+    )
+    

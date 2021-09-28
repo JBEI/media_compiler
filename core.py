@@ -118,6 +118,10 @@ def find_volumes_bulk(df_stock,
     
     df_volumes = df_target_conc.copy()
     df_volumes['Water'] = None
+    
+    df_conc_level = pd.DataFrame(data='high',
+                                 index=df_target_conc.index,
+                                 columns=df_target_conc.columns)
         
     target_conc_val = df_target_conc.values
     
@@ -142,18 +146,24 @@ def find_volumes_bulk(df_stock,
                 if verbose > 1:
                     print(f'High: Not all volumes are >={min_tip_volume} uL!')
 
+                # Find volumes smaller than min transfer volume
                 comp_small_vol = df_example[df_example['Volumes[uL]'] < min_tip_volume - EPS].index 
                 if verbose:
                     print(f'Compoments small: {comp_small_vol}')
+                
+                # Assign low concentrations for those components
                 for comp in comp_small_vol:
                     df_example.at[comp, 'Stock Concentration[mM]'] = df_stock.at[comp,'Low Concentration[mM]']
+                    df_conc_level.iloc[i][comp] = 'low'
 
+                # Recalculate  volumes
                 volumes, df_example_new = find_volumes(
                     well_volume, 
                     components=df_stock.index,
                     stock_conc_val=df_example['Stock Concentration[mM]'].values, 
                     target_conc_val=target_conc_val[i],
                     culture_ratio=culture_ratio)
+                
                 if not (df_example_new['Volumes[uL]'] >= min_tip_volume - EPS).all():
                     if verbose >= 1:
                         print(f'High + Low min vol: Not all volumes are >={min_tip_volume} uL!')
@@ -210,7 +220,7 @@ def find_volumes_bulk(df_stock,
     print(f'Sucess rate: {100*success_num/n_samples}%')
     print(f'Sucess rate (water): {100*success_wat_num/n_samples}%')
     
-    return df_volumes
+    return df_volumes, df_conc_level
     
 
 def find_dilutions(volumes):

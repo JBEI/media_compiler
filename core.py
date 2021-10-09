@@ -262,7 +262,7 @@ def create_media_description(series: pd.Series):
     return description[:-2]
 
 
-def designs_pairwise(art, df_rec, df_train=None):
+def designs_pairwise(art, df_rec, user_params, df_train=None):
 
     dim = art.num_input_var
 

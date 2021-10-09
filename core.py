@@ -262,31 +262,63 @@ def create_media_description(series: pd.Series):
     return description[:-2]
 
 
-def designs_pairwise(art, df):
+def designs_pairwise(art, df_rec, df_train=None):
 
     dim = art.num_input_var
 
-    plt.style.use(["seaborn-talk"])
+    plt.style.use('seaborn-whitegrid')
 
     fig = plt.figure(figsize=(35, 35))
     fig.patch.set_facecolor("white")
 
-    X = df.values
+    X = df_rec[user_params['components']].values
+    X_train = df_train[user_params['components']].values
+    standard = df_train[df_train['Label']=='standard'].drop(columns='Label').values
 
     for var1 in range(dim):
         for var2 in range(var1 + 1, dim):
 
             ax = fig.add_subplot(dim, dim, (var2 * dim + var1 + 1))
             ax.scatter(
-                X[:, var1],
-                X[:, var2],
+                X_train[:, var1],
+                X_train[:, var2],
                 c="r",
-                edgecolor="r",
                 marker="+",
+                s=150*df_train['OD340'],
                 lw=1,
                 label="Train data",
             )
             
+            ax.scatter(
+                standard[:, var1],
+                standard[:, var2],
+                c="k",
+                marker="+",
+                s=150*standard[:, -1].astype(float),
+                lw=1,
+                label="Standard",
+            )
+            
+            ax.scatter(
+                X[:, var1],
+                X[:, var2],
+                c="g",
+                marker="+",
+                s=150*df_rec['OD340_pred'],
+                lw=1,
+                label="Recommendations",
+            )
+            
+            ax.scatter(
+                X[-1, var1],
+                X[-1, var2],
+                c="k",
+                marker="+",
+                s=150*df_rec['OD340_pred'].values[-1],
+                lw=1,
+                label="Standard",
+            )
+                                   
             if var2 == (dim - 1):
                 ax.set_xlabel(art.input_vars[var1])
             if var1 == 0:
@@ -294,6 +326,10 @@ def designs_pairwise(art, df):
                 if var2 == 0:
                     ax.legend(loc="center left", bbox_to_anchor=(1, 0.5), shadow=True)
 
-    fig.savefig(f'{art.outDir}/designs_pairwise.png', transparent=False, dpi=300
+    fig.savefig(
+        f'{art.outDir}/designs_pairwise.png',
+        bbox_inches="tight",
+        transparent=False, 
+        dpi=300
     )
     

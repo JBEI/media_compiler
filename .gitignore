@@ -104,3 +104,8 @@ ENV/
 .DS_Store
 
 legacy/
+data/flaviolin/DBTL4_error/art.pkl
+data/flaviolin/DBTL4_error/draws.txt
+data/flaviolin/DBTL4_error/metric0.csv
+data/flaviolin/DBTL4_error/predictions_vs_observations_OD340.png
+data/flaviolin/DBTL4_error/recommendations.csv

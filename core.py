@@ -262,7 +262,7 @@ def create_media_description(series: pd.Series):
     return description[:-2]
 
 
-def designs_pairwise(art, df_rec, user_params, df_train=None):
+def designs_pairwise(art, df_rec, user_params, initial=False, df_train=None):
 
     dim = art.num_input_var
 
@@ -272,49 +272,56 @@ def designs_pairwise(art, df_rec, user_params, df_train=None):
     fig.patch.set_facecolor("white")
 
     X = df_rec[user_params['components']].values
-    X_train = df_train[user_params['components']].values
-    standard = df_train[df_train['Label']=='standard'].drop(columns='Label').values
+    
+    if not initial:
+        X_train = df_train[user_params['components']].values
+        standard = df_train[df_train['Label']=='standard'].drop(columns='Label').values
 
     for var1 in range(dim):
         for var2 in range(var1 + 1, dim):
 
             ax = fig.add_subplot(dim, dim, (var2 * dim + var1 + 1))
-            ax.scatter(
-                X_train[:, var1],
-                X_train[:, var2],
-                c="r",
-                marker="+",
-                s=150*df_train['OD340'],
-                lw=1,
-                label="Train data",
-            )
             
-            ax.scatter(
-                standard[:, var1],
-                standard[:, var2],
-                c="k",
-                marker="+",
-                s=150*standard[:, -1].astype(float),
-                lw=1,
-                label="Standard",
-            )
+            if not initial:
+                ax.scatter(
+                    X_train[:, var1],
+                    X_train[:, var2],
+                    c="r",
+                    marker="+",
+                    s=150*df_train['OD340'],
+                    lw=1,
+                    label="Train data",
+                )
+
+                ax.scatter(
+                    standard[:, var1],
+                    standard[:, var2],
+                    c="k",
+                    marker="+",
+                    s=150*standard[:, -1].astype(float),
+                    lw=1,
+                    label="Standard",
+                )
             
+            scale = 100 if initial else 150*df_rec['OD340_pred']
             ax.scatter(
                 X[:, var1],
                 X[:, var2],
                 c="g",
                 marker="+",
-                s=150*df_rec['OD340_pred'],
+                s=scale,
                 lw=1,
                 label="Recommendations",
             )
             
+            if not initial:
+                scale = 150*df_rec['OD340_pred'].values[-1]
             ax.scatter(
                 X[-1, var1],
                 X[-1, var2],
                 c="k",
                 marker="+",
-                s=150*df_rec['OD340_pred'].values[-1],
+                s=scale,
                 lw=1,
                 label="Standard",
             )

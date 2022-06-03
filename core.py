@@ -33,14 +33,14 @@ def find_volumes(well_volume: float,
         df = df_stock_conc.copy()
     else:
         df = pd.DataFrame(columns=["Component",
-                                   "Stock Concentration[mM]",
-                                   "Target Concentration[mM]"])
+                                   "Stock Concentration",
+                                   "Target Concentration"])
         if components is not None:
            df["Component"] = components
         df = df.set_index("Component")
 
     if stock_conc_val is not None:
-        df["Stock Concentration[mM]"] = stock_conc_val
+        df["Stock Concentration"] = stock_conc_val
 
     # TODO: Make it for the whole file
     if target_conc_file is not None:
@@ -48,7 +48,7 @@ def find_volumes(well_volume: float,
         target_conc_val = df_target_conc.loc[0].values
 
     elif target_conc_val is not None:
-        df["Target Concentration[mM]"] = target_conc_val
+        df["Target Concentration"] = target_conc_val
     else:
         print('Please provide target concentrations file or values.')
 
@@ -96,7 +96,7 @@ def find_volumes(well_volume: float,
 
 def check_solubility(df, solubility, verbose=True):    
     
-    components = list(df[df["Stock Concentration[mM]"] > solubility].index)
+    components = list(df[df["Stock Concentration"] > solubility].index)
     
     if components:
         if verbose:
@@ -139,7 +139,7 @@ def find_volumes_bulk(df_stock,
             volumes, df_example = find_volumes(
                 well_volume,
                 components=df_stock.index,
-                stock_conc_val=df_stock['High Concentration[mM]'].values, 
+                stock_conc_val=df_stock['High Concentration'].values, 
                 target_conc_val=target_conc_val[i],
                 culture_ratio=culture_ratio)
             if not (df_example['Volumes[uL]'] >= min_tip_volume - EPS).all():
@@ -153,14 +153,14 @@ def find_volumes_bulk(df_stock,
                 
                 # Assign low concentrations for those components
                 for comp in comp_small_vol:
-                    df_example.at[comp, 'Stock Concentration[mM]'] = df_stock.at[comp,'Low Concentration[mM]']
+                    df_example.at[comp, 'Stock Concentration'] = df_stock.at[comp,'Low Concentration']
                     df_conc_level.iloc[i][comp] = 'low'
 
                 # Recalculate  volumes
                 volumes, df_example_new = find_volumes(
                     well_volume, 
                     components=df_stock.index,
-                    stock_conc_val=df_example['Stock Concentration[mM]'].values, 
+                    stock_conc_val=df_example['Stock Concentration'].values, 
                     target_conc_val=target_conc_val[i],
                     culture_ratio=culture_ratio)
                 
@@ -195,7 +195,7 @@ def find_volumes_bulk(df_stock,
                 volumes, df_example = find_volumes(
                     well_volume, 
                     components=df_stock.index,
-                    stock_conc_val=df_stock['Low Concentration[mM]'].values, 
+                    stock_conc_val=df_stock['Low Concentration'].values, 
                     target_conc_val=target_conc_val[i],
                     culture_ratio=culture_ratio)
 
@@ -262,7 +262,13 @@ def create_media_description(series: pd.Series):
     return description[:-2]
 
 
-def designs_pairwise(art, df_rec, user_params, initial=False, df_train=None):
+def designs_pairwise(art, 
+                     df_rec, 
+                     user_params, 
+#                      initial=False, 
+                     df_train=None,
+                     df_control=None
+                    ):
 
     dim = art.num_input_var
 
@@ -273,16 +279,19 @@ def designs_pairwise(art, df_rec, user_params, initial=False, df_train=None):
 
     X = df_rec[user_params['components']].values
     
-    if not initial:
+    if df_train is not None:
         X_train = df_train[user_params['components']].values
         standard = df_train[df_train['Label']=='standard'].drop(columns='Label').values
+        
+    if df_control is not None:
+        X_control = df_control[user_params['components']].values
 
     for var1 in range(dim):
         for var2 in range(var1 + 1, dim):
 
             ax = fig.add_subplot(dim, dim, (var2 * dim + var1 + 1))
             
-            if not initial:
+            if df_train is not None:
                 ax.scatter(
                     X_train[:, var1],
                     X_train[:, var2],
@@ -303,7 +312,8 @@ def designs_pairwise(art, df_rec, user_params, initial=False, df_train=None):
                     label="Standard",
                 )
             
-            scale = 100 if initial else 150*df_rec['OD340_pred']
+            scale = 100 if df_train is None else 150*df_rec['OD340_pred']
+            
             ax.scatter(
                 X[:, var1],
                 X[:, var2],
@@ -314,17 +324,29 @@ def designs_pairwise(art, df_rec, user_params, initial=False, df_train=None):
                 label="Recommendations",
             )
             
-            if not initial:
-                scale = 150*df_rec['OD340_pred'].values[-1]
-            ax.scatter(
-                X[-1, var1],
-                X[-1, var2],
+            if df_control is not None:
+                ax.scatter(
+                X_control[:, var1],
+                X_control[:, var2],
                 c="k",
+                edgecolor="k",
                 marker="+",
                 s=scale,
                 lw=1,
                 label="Standard",
             )
+            
+            if df_train:
+                scale = 150*df_rec['OD340_pred'].values[-1]
+                ax.scatter(
+                    X[-1, var1],
+                    X[-1, var2],
+                    c="k",
+                    marker="+",
+                    s=scale,
+                    lw=1,
+                    label="Standard",
+                )
                                    
             if var2 == (dim - 1):
                 ax.set_xlabel(art.input_vars[var1])
@@ -340,3 +362,43 @@ def designs_pairwise(art, df_rec, user_params, initial=False, df_train=None):
         dpi=300
     )
     
+
+def map_01_to_bounds(df, bounds_file, df_stand, fraction): 
+    """Function that maps random designs from interval [0, 1] to our ranges defined by the bounds_file.
+    
+    :param df: A pandas DataFrame object with values for each component, e.g. a recommendations dataframe output from ART 
+    :type df: pandas DataFrame
+    :param bounds_file: The path to a bounds file (Excel or CSV format).
+    :type bounds_file: string
+    :param df_stand: A pandas DataFrame object with standard media concentrations. Loaded from the standard recipe file.
+    :type df_stand: pandas DataFrame
+    :param fraction: Fraction of the all designs you want to take values below the standard, e.g. 0.2 means 20% of all concentrations will have values lower than the standard.
+    :type fraction: float
+    """
+    
+    df_ranges = df.copy()
+    
+    df_bounds = pd.read_csv(bounds_file).set_index('Variable')
+    
+    for component in df.columns:
+        lb = df_bounds.at[component, 'Min']
+        ub = df_bounds.at[component, 'Max']
+        stand = df_stand.at[component,'Concentration']
+        
+        df_ranges[component] = [
+            lb + (stand - lb)*r/fraction if r < fraction else stand + (ub - stand)*(r-fraction)/(1-fraction) 
+            for r in df[component]
+        ]
+
+    return df_ranges
+
+
+class MediaWarning(Warning):
+    pass
+    
+    
+class NoFeasibleVolumesWarn(MediaWarning):
+    def __str__(self):
+        return (
+            "No feasible volumes are found!"
+        )

@@ -17,3 +17,5 @@ To do so, run the notebooks in order.
 6) To move to the next DBTL cycle after the first 2 cycles, go through the notebook "C_ART_Media_Designs.ipynb" and move to step 3.
 
 7) For every new DBTL cycle, iterate steps 6->3->4->5
+
+[![DOI](https://zenodo.org/badge/499339738.svg)](https://doi.org/10.5281/zenodo.15093357)

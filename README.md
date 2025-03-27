@@ -18,4 +18,4 @@ To do so, run the notebooks in order.
 
 7) For every new DBTL cycle, iterate steps 6->3->4->5
 
-[![DOI](https://zenodo.org/badge/499339738.svg)](https://doi.org/10.5281/zenodo.15093357)
+[![DOI](https://zenodo.org/badge/190084690.svg)](https://doi.org/10.5281/zenodo.15093708)
